@@ -16,7 +16,7 @@
     "globals": "^15.13.0",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.1",
-    "wrangler": "^3.97.0"
+    "wrangler": "^3.109.1"
   },
   "dependencies": {
     "discord-api-types": "^0.37.112",
