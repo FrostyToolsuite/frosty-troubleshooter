@@ -26,10 +26,4 @@ export const CHAT_COMMAND = {
   ],
 };
 
-export const IDK_COMMAND = {
-  name: 'idk',
-  description: 'test',
-  dm_permission: false
-};
-
-export const CommandList = [PING_COMMAND, TEMPLATE_COMMAND, CHAT_COMMAND, IDK_COMMAND];
+export const CommandList = [PING_COMMAND, TEMPLATE_COMMAND, CHAT_COMMAND];
