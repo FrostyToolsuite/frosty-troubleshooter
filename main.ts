@@ -31,8 +31,12 @@ async function verifyDiscordRequest(req: Request, body: string) {
 }
 
 Deno.serve(
-  { port: 8080 },
+  { port: Number(Deno.env.get("PORT")) || 8080 },
   async (req: Request) => {
+    if (req.method === 'GET') {
+      return new Response("Server Status OK", { status: 200 });
+    }
+
     const body = await req.text();
     
     if (!(await verifyDiscordRequest(req, body))) {
@@ -41,9 +45,6 @@ Deno.serve(
 
     const message = JSON.parse(body);
 
-    if (req.method === 'GET') {
-      return new Response("Server Status OK", { status: 200 });
-    }
     if (req.method === 'POST') {
       switch (message.type) {
         case InteractionType.PING: {
