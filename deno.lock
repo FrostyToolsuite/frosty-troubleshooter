@@ -1,0 +1,17 @@
+{
+  "version": "4",
+  "specifiers": {
+    "npm:discord-interactions@*": "4.1.1"
+  },
+  "npm": {
+    "discord-interactions@4.1.1": {
+      "integrity": "sha512-dCrdJFSHQrEHXB8tk+LpIhAL7/+/UXCFDzooYmB6jj7b/zuhdbETpcZXLYQpSfcSRpF5wjmnu1XwuHlvdF1KpQ=="
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@std/dotenv@*",
+      "npm:discord-interactions@*"
+    ]
+  }
+}

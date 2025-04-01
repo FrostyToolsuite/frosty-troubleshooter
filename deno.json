@@ -1,9 +1,9 @@
 {
   "tasks": {
-    "dev": "deno run --watch main.ts"
+    "dev": "deno run --watch --allow-net --allow-env main.ts"
   },
   "imports": {
-    "@std/dotenv": "jsr:@std/dotenv@^0.225.3",
-    "discord-interactions": "npm:discord-interactions@^4.1.1"
+    "@std/dotenv": "jsr:@std/dotenv",
+    "discord-interactions": "npm:discord-interactions"
   }
 }
