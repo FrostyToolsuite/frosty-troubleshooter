@@ -16,7 +16,6 @@ enum EnvVars {
 }
 
 async function verifyDiscordRequest(req: Request, body: string) {
-  console.log("[Triggered] verifyDiscordRequest");
 
   const signature = req.headers.get("X-Signature-Ed25519");
   const timestamp = req.headers.get("X-Signature-Timestamp");
@@ -34,40 +33,44 @@ async function verifyDiscordRequest(req: Request, body: string) {
 Deno.serve(
   { port: 8080 },
   async (req: Request) => {
-    console.log("[Triggered] Deno.serve");
     const body = await req.text();
     
     if (!(await verifyDiscordRequest(req, body))) {
-      console.log("[Triggered] 401");
       return new Response("Invalid request signature", { status: 401 });
     }
 
     const message = JSON.parse(body);
 
+    if (req.method === 'GET') {
+      return new Response("Server Status OK", { status: 200 });
+    }
     if (req.method === 'POST') {
-      console.log("[Triggered] POST request");
       switch (message.type) {
         case InteractionType.PING: {
-          console.log("[Triggered] PING");
           return new Response(JSON.stringify({
             type: InteractionResponseType.PONG
           }));
         }
         case InteractionType.APPLICATION_COMMAND: {
-          console.log("[Triggered] APPLICATION_COMMAND");
           switch (message.data.name.toLowerCase()) {
             case PING_COMMAND.name.toLowerCase(): {
-              return new Response(JSON.stringify({
-                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                data: {
-                  content: "Pong",
+              return new Response(
+                JSON.stringify({
+                  type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                  data: {
+                    content: "Pong"
+                  }
+                }),
+                {
+                  headers: {
+                    "Content-Type": "application/json; charset=utf-8"
+                  }
                 }
-              }));
+              );
             }
           }
         }
       }
     }
-    console.log("[Triggered] 400");
     return new Response("Invalid request", { status: 400 });
 });
