@@ -7,7 +7,7 @@
 /.vscode/
 
 # Node
-/.node_modules/
+/node_modules/
 
 # macOS
 .DS_Store
