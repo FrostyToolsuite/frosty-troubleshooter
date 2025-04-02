@@ -57,11 +57,11 @@ Deno.serve(
     }
 
     // Process message
-    const message = JSON.parse(body);
+    const interaction = JSON.parse(body);
 
     // Handle POST requests
     if (req.method === 'POST') {
-      switch (message.type) {
+      switch (interaction.type) {
         // Response PING
         case InteractionType.PING: {
           return new Response(JSON.stringify({
@@ -70,7 +70,7 @@ Deno.serve(
         }
         // Handle APPLICATION_COMMAND
         case InteractionType.APPLICATION_COMMAND: {
-          switch (message.data.name.toLowerCase()) {
+          switch (interaction.data.name.toLowerCase()) {
             case PING_COMMAND.name.toLowerCase(): {
               return new Response(
                 JSON.stringify({
@@ -104,7 +104,9 @@ Deno.serve(
               );
             }
             case CHAT_COMMAND.name.toLowerCase(): {
-              await fetch(`https://discord.com/api/v10/interactions/${message.id}/${message.token}/callback`, {
+              const prompt = interaction.data.options.prompt.value;
+
+              await fetch(`https://discord.com/api/v10/interactions/${interaction.id}/${interaction.token}/callback`, {
                 headers: {
                   "Content-Type": "application/json; charset=utf-8",
                   "User-Agent": userAgent
@@ -114,13 +116,43 @@ Deno.serve(
                   type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
                 })
               });
-              console.log("test1");
 
               setTimeout(async () => {
-                console.log("test2");
-              }, 500);
+                const together = new Together();
+                const streamResponse = await together.chat.completions.create({
+                  model: "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
+                  messages: [
+                    { role: "user", content: prompt }
+                  ],
+                  stream: true,
+                });
 
-              console.log("test3");
+                let message = "";
+                for await (const chunk of streamResponse) {
+                  message += chunk.choices[0]?.delta?.content || '';
+                  await fetch(`https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`, {
+                    headers: {
+                      "Content-Type": "application/json; charset=utf-8",
+                      "User-Agent": userAgent
+                    },
+                    method: 'PATCH',
+                    body: JSON.stringify({
+                      content: message + "\n\n*Generating...*\n-# AI generated content, can make mistakes, check important info.",
+                    })
+                  });
+                }
+                await fetch(`https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`, {
+                  headers: {
+                    "Content-Type": "application/json; charset=utf-8",
+                    "User-Agent": userAgent
+                  },
+                  method: 'PATCH',
+                  body: JSON.stringify({
+                    content: message + "\n-# AI generated content, can make mistakes, check important info.",
+                  })
+                });
+              }, 0);
+
               return new Response(null, {
                 status: 202,
                 headers: {
