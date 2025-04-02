@@ -24,12 +24,20 @@ if (!applicationId) {
 
 const url = `https://discord.com/api/v10/applications/${applicationId}/commands`;
 
-fetch(url, {
+const response = await fetch(url, {
   headers: {
-    "Content-Type": "application/json; charset=utf-8",
-    "User-Agent": "DiscordBot (https://github.com/FrostyToolsuite/frosty-troubleshooter, 0.1.0)",
-    "Authorization": `Bot ${token}`,
+    'Content-Type': 'application/json',
+    Authorization: `Bot ${token}`
   },
   method: 'PUT',
   body: JSON.stringify(CommandList),
 });
+
+if (response.ok) {
+  console.log('Registered all commands');
+  console.log(await response.text());
+} else {
+  console.error('Error registering commands');
+  console.error(await response.text());
+  throw new Error('Error registering commands');
+}
