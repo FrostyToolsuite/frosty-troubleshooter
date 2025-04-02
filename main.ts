@@ -90,10 +90,26 @@ Deno.serve(
                 }),
                 {
                   headers: {
-                    "Content-Type": "application/json; charset=utf-8"
+                    "Content-Type": "application/json; charset=utf-8",
+                    "User-Agent": userAgent
                   }
                 }
               );
+            }
+            case CHAT_COMMAND.name.toLowerCase(): {
+              await fetch(`https://discord.com/api/v10/interactions/${message.id}/${message.token}/callback`, {
+                headers: {
+                  "Content-Type": "application/json; charset=utf-8",
+                  "User-Agent": userAgent
+                },
+                method: 'POST',
+                body: JSON.stringify({
+                  type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                  data: {
+                    content: "test"
+                  }
+                })
+              });
             }
           }
         }
