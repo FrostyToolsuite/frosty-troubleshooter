@@ -8,6 +8,7 @@ import {
   TEMPLATE_COMMAND,
   CHAT_COMMAND
 } from "./commands.ts";
+import Together from "together-ai";
 
 // Environment variables
 enum EnvVars {
@@ -38,7 +39,13 @@ Deno.serve(
   async (req: Request) => {
     // Response GET requests (not from Discord)
     if (req.method === 'GET') {
-      return new Response("Server Status OK", { status: 200 });
+      return new Response("Server Status OK", {
+        status: 200,
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "User-Agent": userAgent
+        }
+      });
     }
 
     // Process body
@@ -109,16 +116,27 @@ Deno.serve(
               });
               console.log("test1");
 
-              setTimeout(() => {
+              setTimeout(async () => {
                 console.log("test2");
               }, 500);
 
               console.log("test3");
-              return new Response(null, { status: 202 });
+              return new Response(null, {
+                status: 202,
+                headers: {
+                  "User-Agent": userAgent
+                }
+              });
             }
           }
         }
       }
     }
-    return new Response("Invalid request", { status: 400 });
+    return new Response("Invalid request", {
+      status: 400,
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "User-Agent": userAgent
+      }
+    });
 });
