@@ -62,7 +62,6 @@ Deno.serve(
         }
         // Handle APPLICATION_COMMAND
         case InteractionType.APPLICATION_COMMAND: {
-          console.log("Received APPLICATION_COMMAND: ", message.data.name);
           switch (message.data.name.toLowerCase()) {
             case PING_COMMAND.name.toLowerCase(): {
               return new Response(
