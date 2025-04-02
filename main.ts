@@ -104,7 +104,9 @@ Deno.serve(
               );
             }
             case CHAT_COMMAND.name.toLowerCase(): {
-              const prompt = interaction.data.options.prompt.value;
+              const prompt = interaction.data.options?.find(
+                (option: { name: string }) => option.name === "prompt"
+              )?.value;
 
               await fetch(`https://discord.com/api/v10/interactions/${interaction.id}/${interaction.token}/callback`, {
                 headers: {
