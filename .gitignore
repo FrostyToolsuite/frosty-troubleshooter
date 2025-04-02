@@ -1,7 +1,13 @@
+# Local configs
 .env
+
+# IDE
 /.idea/
 /.vs/
 /.vscode/
+
+# Node
+/.node_modules/
 
 # macOS
 .DS_Store

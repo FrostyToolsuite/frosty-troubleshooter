@@ -3,7 +3,7 @@
     "dev": "deno run --watch --allow-net --allow-env main.ts"
   },
   "imports": {
-    "@std/dotenv": "jsr:@std/dotenv",
     "discord-interactions": "npm:discord-interactions"
-  }
+  },
+  "nodeModulesDir": "auto"
 }
