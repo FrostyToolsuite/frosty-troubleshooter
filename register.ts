@@ -26,8 +26,9 @@ const url = `https://discord.com/api/v10/applications/${applicationId}/commands`
 
 fetch(url, {
   headers: {
-    'Content-Type': 'application/json',
-    Authorization: `Bot ${token}`,
+    "Content-Type": "application/json; charset=utf-8",
+    "User-Agent": "DiscordBot (https://github.com/FrostyToolsuite/frosty-troubleshooter, 0.1.0)",
+    "Authorization": `Bot ${token}`,
   },
   method: 'PUT',
   body: JSON.stringify(CommandList),

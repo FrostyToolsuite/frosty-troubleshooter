@@ -8,13 +8,13 @@ export const PING_COMMAND = {
 
 export const TEMPLATE_COMMAND = {
   name: 'template',
-  description: 'PLACEHOLDER, Fill in a template easier',
+  description: 'Fill in a template easier',
   dm_permission: false
 };
 
 export const CHAT_COMMAND = {
   name: 'chat',
-  description: 'Ask AI',
+  description: 'Test command to chat with AI',
   dm_permission: false,
   options: [
     {

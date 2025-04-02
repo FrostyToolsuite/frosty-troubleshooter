@@ -16,6 +16,7 @@ enum EnvVars {
   DISCORD_TOKEN = "DISCORD_TOKEN",
   TOGETHER_API_KEY = "TOGETHER_API_KEY"
 }
+const userAgent = "DiscordBot (https://github.com/FrostyToolsuite/frosty-troubleshooter, 0.1.0)"
 
 async function verifyDiscordRequest(req: Request, body: string) {
 
@@ -73,7 +74,8 @@ Deno.serve(
                 }),
                 {
                   headers: {
-                    "Content-Type": "application/json; charset=utf-8"
+                    "Content-Type": "application/json; charset=utf-8",
+                    "User-Agent": userAgent
                   }
                 }
               );
