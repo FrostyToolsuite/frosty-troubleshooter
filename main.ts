@@ -4,7 +4,9 @@ import {
   verifyKey
 } from 'discord-interactions';
 import {
-  PING_COMMAND
+  PING_COMMAND,
+  TEMPLATE_COMMAND,
+  CHAT_COMMAND
 } from "./commands.ts";
 
 // Environment variables
@@ -33,25 +35,32 @@ async function verifyDiscordRequest(req: Request, body: string) {
 Deno.serve(
   { port: Number(Deno.env.get("PORT")) || 8080 },
   async (req: Request) => {
+    // Response GET requests (not from Discord)
     if (req.method === 'GET') {
       return new Response("Server Status OK", { status: 200 });
     }
 
+    // Process body
     const body = await req.text();
     
+    // Verify the request is from Discord
     if (!(await verifyDiscordRequest(req, body))) {
       return new Response("Invalid request signature", { status: 401 });
     }
 
+    // Process message
     const message = JSON.parse(body);
 
+    // Handle POST requests
     if (req.method === 'POST') {
       switch (message.type) {
+        // Response PING
         case InteractionType.PING: {
           return new Response(JSON.stringify({
             type: InteractionResponseType.PONG
           }));
         }
+        // Handle APPLICATION_COMMAND
         case InteractionType.APPLICATION_COMMAND: {
           switch (message.data.name.toLowerCase()) {
             case PING_COMMAND.name.toLowerCase(): {
@@ -60,6 +69,21 @@ Deno.serve(
                   type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
                   data: {
                     content: "Pong"
+                  }
+                }),
+                {
+                  headers: {
+                    "Content-Type": "application/json; charset=utf-8"
+                  }
+                }
+              );
+            }
+            case TEMPLATE_COMMAND.name.toLowerCase(): {
+              return new Response(
+                JSON.stringify({
+                  type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                  data: {
+                    content: "This command is currently a placeholder"
                   }
                 }),
                 {
