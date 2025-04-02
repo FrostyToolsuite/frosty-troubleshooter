@@ -6,4 +6,4 @@ WORKDIR /app
 
 ADD . /app
 
-CMD ["run", "--allow-net", "--allow-env", "main.ts"]
+ENTRYPOINT ["run", "--node-modules-dir=auto", "--allow-net", "--allow-env", "main.ts"]
