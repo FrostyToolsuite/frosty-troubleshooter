@@ -104,12 +104,17 @@ Deno.serve(
                 },
                 method: 'POST',
                 body: JSON.stringify({
-                  type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                  data: {
-                    content: "test"
-                  }
+                  type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
                 })
               });
+              console.log("test1");
+
+              setTimeout(() => {
+                console.log("test2");
+              }, 500);
+
+              console.log("test3");
+              return new Response(null, { status: 202 });
             }
           }
         }
