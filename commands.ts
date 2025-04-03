@@ -20,10 +20,10 @@ export const CHAT_COMMAND = {
     {
       name: "prompt",
       description: "The message you want to send to the AI.",
-      type: 3, // 3 = String
-      required: true,
-    },
-  ],
+      type: 3,
+      required: true
+    }
+  ]
 };
 
 export const CommandList = [PING_COMMAND, TEMPLATE_COMMAND, CHAT_COMMAND];

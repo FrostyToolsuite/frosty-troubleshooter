@@ -34,6 +34,9 @@ async function verifyDiscordRequest(req: Request, body: string) {
   return await verifyKey(body, signature, timestamp, discordPublicKey);
 }
 
+const abortControllers = new Map<string, AbortController>();
+
+
 Deno.serve(
   { port: Number(Deno.env.get("PORT")) || 8080 },
   async (req: Request) => {
@@ -119,18 +122,26 @@ Deno.serve(
                 })
               });
 
-              setTimeout(async () => {
-                const together = new Together();
+              // Create an AbortController to handle cancelation
+              const abortController = new AbortController();
+              const signal = abortController.signal;
+              abortControllers.set(interaction.id, abortController);
+
+              let message = "";
+              (async () => {
+                try {
+                const together = new Together({ apiKey: Deno.env.get(EnvVars.TOGETHER_API_KEY) });
                 const streamResponse = await together.chat.completions.create({
                   model: "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
                   messages: [
                     { role: "system", content: "You are a tool embed into a Discord bot in Frosty's official server, designed to assist users of Frosty, an open-source project, a modding platform for games running on EA DICE's Frostbite game engine. The tools include Frosty Editor for developers creating mods and Frosty Mod Manager for managing and installing mods. You are now in early development, but actually in produce environment for testing." },
+                    { role: "system", content: "Use Markdown as output format. Character limit is 1900." },
                     { role: "user", content: prompt }
                   ],
                   stream: true,
                 });
 
-                let message = "";
+                
                 for await (const chunk of streamResponse) {
                   message += chunk.choices[0]?.delta?.content || '';
                   await fetch(`https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`, {
@@ -140,10 +151,19 @@ Deno.serve(
                     },
                     method: 'PATCH',
                     body: JSON.stringify({
-                      content: message + "\n\n*Generating...*\n-# AI generated content, can make mistakes, check important info.",
+                      content: message + "\n\n***Generating...***\n-# AI generated content, can make mistakes, check important info.",
+                      components: [
+                        {
+                          type: 2, // Button
+                          style: 4, // Danger
+                          label: "Stop",
+                          custom_id: "Abort_" + interaction.id,
+                        },
+                      ],
                     })
                   });
                 }
+
                 await fetch(`https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`, {
                   headers: {
                     "Content-Type": "application/json; charset=utf-8",
@@ -154,7 +174,35 @@ Deno.serve(
                     content: message + "\n-# AI generated content, can make mistakes, check important info.",
                   })
                 });
-              }, 0);
+                } catch (error) {
+                  if (signal.aborted) {
+                    await fetch(`https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`, {
+                      headers: {
+                        "Content-Type": "application/json; charset=utf-8",
+                        "User-Agent": userAgent
+                      },
+                      method: 'PATCH',
+                      body: JSON.stringify({
+                        content: message + "\n**Request Aborted**\n-# AI generated content, can make mistakes, check important info.",
+                      })
+                    });
+                  } else {
+                    await fetch(`https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`, {
+                      headers: {
+                        "Content-Type": "application/json; charset=utf-8",
+                        "User-Agent": userAgent
+                      },
+                      method: 'PATCH',
+                      body: JSON.stringify({
+                        content: message + "\n-# AI generated content, can make mistakes, check important info.\n**An unexpected error occurred**\n" + error,
+                      })
+                    });
+                  }
+                } finally {
+                  // Clean up the AbortController from the map
+                  abortControllers.delete(interaction.id);
+                }
+              })();
 
               return new Response(null, {
                 status: 202,
@@ -164,6 +212,27 @@ Deno.serve(
               });
             }
           }
+          return new Response("Invalid command", {
+            status: 400,
+            headers: {
+              "Content-Type": "text/plain; charset=utf-8",
+              "User-Agent": userAgent
+            }
+          });
+        }
+        case InteractionType.MESSAGE_COMPONENT: {
+          const customId = interaction.data.custom_id;
+
+          if (customId.startsWith("Abort_")) {
+            const interactionId = customId.replace("Abort_", "");
+            const abortController = abortControllers.get(interactionId);
+            if (abortController) {
+              abortController.abort();
+              abortControllers.delete(interactionId);
+            }        
+          }
+
+          break;
         }
       }
     }
