@@ -159,7 +159,7 @@ Deno.serve(
                       
                       (async () => {
                         const controller = new AbortController();
-                        setTimeout(() => controller.abort(), 5000); // Set timeout to 5 seconds
+                        setTimeout(() => controller.abort(), 500); // Set timeout to 0.5 seconds
                         try
                         {
                           await fetch(
