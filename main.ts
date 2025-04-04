@@ -118,7 +118,17 @@ Deno.serve(
                 },
                 method: 'POST',
                 body: JSON.stringify({
-                  type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+                  type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
+                  data: {
+                    components: [
+                      {
+                        type: 2, // Button
+                        style: 4, // Danger
+                        label: "Stop",
+                        custom_id: "Abort_" + interaction.id
+                      }
+                    ]
+                  }
                 })
               });
 
@@ -150,20 +160,7 @@ Deno.serve(
                       },
                       method: 'PATCH',
                       body: JSON.stringify({
-                        content: message + "\n\n***Generating...***\n-# AI generated content, can make mistakes, check important info.",
-                        components: [
-                          {
-                            type: 1, // Action Row
-                            components: [
-                              {
-                                type: 2, // Button
-                                style: 4, // Danger
-                                label: "Stop",
-                                custom_id: "Abort_" + interaction.id
-                              }
-                            ]
-                          }
-                        ]
+                        content: message + "\n\n***Generating...***\n-# AI generated content, can make mistakes, check important info."
                       })
                     });
                   }
