@@ -158,9 +158,7 @@ Deno.serve(
                       fetchInProgress = true;
                       (async () => {
                         await fetch(
-                          `https://discord.com/api/v10/webhooks/${
-                            Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)
-                          }/${interaction.token}/messages/@original`,
+                          `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`,
                           {
                             headers: {
                               "Content-Type": "application/json; charset=utf-8",
@@ -168,16 +166,7 @@ Deno.serve(
                             },
                             method: "PATCH",
                             body: JSON.stringify({
-                              content: message +
-                                "\n\n***Generating...***\n-# AI generated content, can make mistakes, check important info.",
-                              components: [
-                                {
-                                  type: 2, // Button
-                                  style: 4, // Danger
-                                  label: "Stop",
-                                  custom_id: "Abort_" + interaction.id,
-                                },
-                              ],
+                              content: message + "\n\n***Generating...***\n-# AI generated content, can make mistakes"
                             }),
                           },
                         );
@@ -190,9 +179,7 @@ Deno.serve(
                   }
 
                   await fetch(
-                    `https://discord.com/api/v10/webhooks/${
-                      Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)
-                    }/${interaction.token}/messages/@original`,
+                    `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`,
                     {
                       headers: {
                         "Content-Type": "application/json; charset=utf-8",
@@ -208,9 +195,7 @@ Deno.serve(
                 } catch (error) {
                   if (signal.aborted) {
                     await fetch(
-                      `https://discord.com/api/v10/webhooks/${
-                        Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)
-                      }/${interaction.token}/messages/@original`,
+                      `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`,
                       {
                         headers: {
                           "Content-Type": "application/json; charset=utf-8",
@@ -225,9 +210,7 @@ Deno.serve(
                     );
                   } else {
                     await fetch(
-                      `https://discord.com/api/v10/webhooks/${
-                        Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)
-                      }/${interaction.token}/messages/@original`,
+                      `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`,
                       {
                         headers: {
                           "Content-Type": "application/json; charset=utf-8",
@@ -236,8 +219,7 @@ Deno.serve(
                         method: "PATCH",
                         body: JSON.stringify({
                           content: message +
-                            "\n-# AI generated content, can make mistakes, check important info.\n**An unexpected error occurred**\n" +
-                            error,
+                            "\n-# AI generated content, can make mistakes, check important info.\n**An unexpected error occurred**\n" + error,
                         }),
                       },
                     );
