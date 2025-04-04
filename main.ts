@@ -118,17 +118,7 @@ Deno.serve(
                 },
                 method: 'POST',
                 body: JSON.stringify({
-                  type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
-                  data: {
-                    components: [
-                      {
-                        type: 2, // Button
-                        style: 4, // Danger
-                        label: "Stop",
-                        custom_id: "Abort_" + interaction.id
-                      }
-                    ]
-                  }
+                  type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
                 })
               });
 
