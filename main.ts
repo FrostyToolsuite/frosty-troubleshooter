@@ -171,7 +171,9 @@ Deno.serve(
                           },
                         );
                         fetchInProgress = false;
-                      })();
+                      })().finally(() => {
+                        fetchInProgress = false;
+                      });
                     }
                   }
                   while (fetchInProgress) {
