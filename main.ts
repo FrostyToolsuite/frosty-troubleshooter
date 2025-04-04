@@ -88,6 +88,7 @@ Deno.serve(
                         }
                       }
                     ]
+                  }
                 }),
                 {
                   headers: {
