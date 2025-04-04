@@ -147,26 +147,27 @@ Deno.serve(
 
                     if (!fetchInProgress) {
                       fetchInProgress = true;
-                      fetch(`https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`, {
-                        headers: {
-                          "Content-Type": "application/json; charset=utf-8",
-                          "User-Agent": userAgent
-                        },
-                        method: 'PATCH',
-                        body: JSON.stringify({
-                          content: message + "\n\n***Generating...***\n-# AI generated content, can make mistakes, check important info.",
-                          components: [
-                            {
-                              type: 2, // Button
-                              style: 4, // Danger
-                              label: "Stop",
-                              custom_id: "Abort_" + interaction.id,
-                            },
-                          ],
-                        })
-                      }).finally(() => {
+                      (async () => {
+                        await fetch(`https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`, {
+                          headers: {
+                            "Content-Type": "application/json; charset=utf-8",
+                            "User-Agent": userAgent
+                          },
+                          method: 'PATCH',
+                          body: JSON.stringify({
+                            content: message + "\n\n***Generating...***\n-# AI generated content, can make mistakes, check important info.",
+                            components: [
+                              {
+                                type: 2, // Button
+                                style: 4, // Danger
+                                label: "Stop",
+                                custom_id: "Abort_" + interaction.id,
+                              },
+                            ],
+                          })
+                        });
                         fetchInProgress = false;
-                      });
+                      })();
                     }
                   }
                   while (fetchInProgress) {
@@ -192,7 +193,7 @@ Deno.serve(
                       },
                       method: 'PATCH',
                       body: JSON.stringify({
-                        content: message + "\n**Request Aborted**\n-# AI generated content, can make mistakes, check important info.",
+                        content: message + "\n***Request Aborted***\n-# AI generated content, can make mistakes, check important info.",
                       })
                     });
                   } else {
