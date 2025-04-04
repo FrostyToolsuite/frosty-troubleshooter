@@ -79,13 +79,15 @@ Deno.serve(
                     content: "Pong",
                     components: [
                       {
-                        type: 2, // Button
-                        style: 4, // Danger
-                        label: "Stop",
-                        custom_id: "Abort_" + interaction.id
+                        "type": 1,
+                        "components": {
+                          type: 2, // Button
+                          style: 1, // Danger
+                          label: "Stop",
+                          custom_id: `Abort_${interaction.id}`
+                        }
                       }
                     ]
-                  },
                 }),
                 {
                   headers: {
@@ -170,7 +172,7 @@ Deno.serve(
                         },
                         method: "PATCH",
                         body: JSON.stringify({
-                          content: message + "\n\n***Generating...***\n-# AI generated content, can make mistakes"
+                          content: message + "\n\n***Generating...***\n\n-# AI generated content, can make mistakes"
                         }),
                       },
                     );
@@ -186,7 +188,7 @@ Deno.serve(
                       method: "PATCH",
                       body: JSON.stringify({
                         content: message +
-                          "\n-# AI generated content, can make mistakes, check important info.",
+                          "\n\n-# AI generated content, can make mistakes, check important info.",
                       }),
                     },
                   );
@@ -202,7 +204,7 @@ Deno.serve(
                         method: "PATCH",
                         body: JSON.stringify({
                           content: message +
-                            "\n***Request Aborted***\n-# AI generated content, can make mistakes, check important info.",
+                            "\n***Request Aborted***\n\n-# AI generated content, can make mistakes, check important info.",
                         }),
                       },
                     );
@@ -217,7 +219,7 @@ Deno.serve(
                         method: "PATCH",
                         body: JSON.stringify({
                           content: message +
-                            "\n-# AI generated content, can make mistakes, check important info.\n**An unexpected error occurred**\n" + error,
+                            "\n\n-# AI generated content, can make mistakes, check important info.\n**An unexpected error occurred**\n" + error,
                         }),
                       },
                     );
