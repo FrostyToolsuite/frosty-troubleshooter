@@ -153,12 +153,17 @@ Deno.serve(
                         content: message + "\n\n***Generating...***\n-# AI generated content, can make mistakes, check important info.",
                         components: [
                           {
-                            type: 2, // Button
-                            style: 4, // Danger
-                            label: "Stop",
-                            custom_id: "Abort_" + interaction.id,
-                          },
-                        ],
+                            type: 1, // Action Row
+                            components: [
+                              {
+                                type: 2, // Button
+                                style: 4, // Danger
+                                label: "Stop",
+                                custom_id: "Abort_" + interaction.id
+                              }
+                            ]
+                          }
+                        ]
                       })
                     });
                   }
