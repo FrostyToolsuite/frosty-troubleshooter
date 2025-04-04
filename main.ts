@@ -156,21 +156,30 @@ Deno.serve(
 
                     if (!fetchInProgress) {
                       fetchInProgress = true;
+                      
                       (async () => {
-                        await fetch(
-                          `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`,
-                          {
-                            headers: {
-                              "Content-Type": "application/json; charset=utf-8",
-                              "User-Agent": userAgent,
+                        const controller = new AbortController();
+                        setTimeout(() => controller.abort(), 5000); // Set timeout to 5 seconds
+                        try
+                        {
+                          await fetch(
+                            `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`,
+                            {
+                              headers: {
+                                "Content-Type": "application/json; charset=utf-8",
+                                "User-Agent": userAgent,
+                              },
+                              method: "PATCH",
+                              body: JSON.stringify({
+                                content: message + "\n\n***Generating...***\n-# AI generated content, can make mistakes"
+                              }),
+                              signal: controller.signal
                             },
-                            method: "PATCH",
-                            body: JSON.stringify({
-                              content: message + "\n\n***Generating...***\n-# AI generated content, can make mistakes"
-                            }),
-                          },
-                        );
-                        fetchInProgress = false;
+                          );
+                        } catch {
+                          // Ignore
+                        }
+                        
                       })().finally(() => {
                         fetchInProgress = false;
                       });
