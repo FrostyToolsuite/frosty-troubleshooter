@@ -134,19 +134,20 @@ Deno.serve(
                   const streamResponse = await together.chat.completions.create({
                     model: "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
                     messages: [
-                      { role: "system", content: "You are a tool embed into a Discord bot in Frosty's official server, designed to assist users of Frosty, an open-source project, a modding platform for games running on EA DICE's Frostbite game engine. The tools include Frosty Editor for developers creating mods and Frosty Mod Manager for managing and installing mods. You are now in early development, but actually in produce environment for testing." },
-                      { role: "system", content: "Use Markdown as output format. Character limit is 1900." },
+                      { role: "system", content: "You are a tool embed into a Discord bot in Frosty's official server, designed to assist users of Frosty, an open-source project, a modding platform for games running on EA DICE's Frostbite game engine. The tools include Frosty Editor for developers creating mods and Frosty Mod Manager for managing and installing mods. You are now in early development, but actually in produce environment for testing. Use Markdown as output format. Character limit is 1900." },
                       { role: "user", content: prompt }
                     ],
                     stream: true,
                   });
 
                   let fetchInProgress = false;
+                  console.log("0");
                   for await (const chunk of streamResponse) {
                     if (signal.aborted) throw new Error("signal.aborted");
                     message += chunk.choices[0]?.delta?.content || '';
-
+                    
                     if (!fetchInProgress) {
+                      console.log("1");
                       fetchInProgress = true;
                       fetch(`https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`, {
                         headers: {
@@ -166,10 +167,13 @@ Deno.serve(
                           ],
                         })
                       }).finally(() => {
+                        console.log("2");
                         fetchInProgress = false;
                       });
                     }
+                    console.log("3");
                   }
+                  console.log("4");
 
                   await fetch(`https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`, {
                     headers: {
