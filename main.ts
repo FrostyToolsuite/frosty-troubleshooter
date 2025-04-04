@@ -77,6 +77,14 @@ Deno.serve(
                   type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
                   data: {
                     content: "Pong",
+                    components: [
+                      {
+                        type: 2, // Button
+                        style: 4, // Danger
+                        label: "Stop",
+                        custom_id: "Abort_" + interaction.id
+                      }
+                    ]
                   },
                 }),
                 {
@@ -149,44 +157,23 @@ Deno.serve(
                     },
                   );
 
-                  let fetchInProgress = false;
                   for await (const chunk of streamResponse) {
                     if (signal.aborted) throw new Error("signal.aborted");
                     message += chunk.choices[0]?.delta?.content || "";
 
-                    if (!fetchInProgress) {
-                      fetchInProgress = true;
-                      
-                      (async () => {
-                        const controller = new AbortController();
-                        setTimeout(() => controller.abort(), 500); // Set timeout to 0.5 seconds
-                        try
-                        {
-                          await fetch(
-                            `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`,
-                            {
-                              headers: {
-                                "Content-Type": "application/json; charset=utf-8",
-                                "User-Agent": userAgent,
-                              },
-                              method: "PATCH",
-                              body: JSON.stringify({
-                                content: message + "\n\n***Generating...***\n-# AI generated content, can make mistakes"
-                              }),
-                              signal: controller.signal
-                            },
-                          );
-                        } catch {
-                          // Ignore
-                        }
-                        
-                      })().finally(() => {
-                        fetchInProgress = false;
-                      });
-                    }
-                  }
-                  while (fetchInProgress) {
-                    await new Promise((resolve) => setTimeout(resolve, 100));
+                    await fetch(
+                      `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`,
+                      {
+                        headers: {
+                          "Content-Type": "application/json; charset=utf-8",
+                          "User-Agent": userAgent,
+                        },
+                        method: "PATCH",
+                        body: JSON.stringify({
+                          content: message + "\n\n***Generating...***\n-# AI generated content, can make mistakes"
+                        }),
+                      },
+                    );
                   }
 
                   await fetch(
