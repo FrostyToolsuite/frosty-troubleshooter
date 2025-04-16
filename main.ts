@@ -192,12 +192,6 @@ Deno.serve(
                       body: JSON.stringify({
                         content: message +
                           "\n\n-# AI generated content, can make mistakes, check important info.",
-                        components: [
-                          {
-                            type: 1,
-                            components: []
-                          }
-                        ]
                       }),
                     },
                   );
@@ -214,12 +208,6 @@ Deno.serve(
                         body: JSON.stringify({
                           content: message +
                             "\n\n**Request Aborted**\n-# AI generated content, can make mistakes, check important info.",
-                          components: [
-                            {
-                              type: 1,
-                              components: []
-                            }
-                          ]
                         }),
                       },
                     );
@@ -235,12 +223,6 @@ Deno.serve(
                         body: JSON.stringify({
                           content: message +
                             "\n\n-# AI generated content, can make mistakes, check important info.\n**An unexpected error occurred**\n" + error,
-                          components: [
-                            {
-                              type: 1,
-                              components: []
-                            }
-                          ]
                         }),
                       },
                     );
@@ -276,13 +258,42 @@ Deno.serve(
             if (abortController) {
               abortController.abort();
               abortControllers.delete(interactionId);
-              return new Response(null, {
-                status: 202,
+            }
+
+            const response = await fetch(
+              `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}`,
+              {
                 headers: {
+                  "Content-Type": "application/json; charset=utf-8",
                   "User-Agent": userAgent,
                 },
-              });
-            }
+                method: "POST",
+                body: JSON.stringify({
+                  content: "[Test] this is a Follow up message",
+                }),
+              },
+            );
+
+            await fetch(
+              `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}`,
+              {
+                headers: {
+                  "Content-Type": "application/json; charset=utf-8",
+                  "User-Agent": userAgent,
+                },
+                method: "POST",
+                body: JSON.stringify({
+                  content: "[Test] Printing response for the follow up message\n" + response.status + "\n" + response.statusText + "\n" + response.body + "\n" + response,
+                }),
+              },
+            );
+
+            return new Response(null, {
+              status: 202,
+              headers: {
+                "User-Agent": userAgent,
+              },
+            });
           }
 
           break;
