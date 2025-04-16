@@ -211,6 +211,35 @@ Deno.serve(
                         }),
                       },
                     );
+
+                    const response = await fetch(
+                      `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}`,
+                      {
+                        headers: {
+                          "Content-Type": "application/json; charset=utf-8",
+                          "User-Agent": userAgent,
+                        },
+                        method: "POST",
+                        body: JSON.stringify({
+                          content: "[Test] this is a Follow up message",
+                        }),
+                      },
+                    );
+        
+                    await fetch(
+                      `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}`,
+                      {
+                        headers: {
+                          "Content-Type": "application/json; charset=utf-8",
+                          "User-Agent": userAgent,
+                        },
+                        method: "POST",
+                        body: JSON.stringify({
+                          content: "[Test] Printing response for the follow up message\n" + response.status + "\n" + response.statusText + "\n" + response.body + "\n" + response,
+                        }),
+                      },
+                    );
+
                   } else {
                     await fetch(
                       `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`,
@@ -259,34 +288,6 @@ Deno.serve(
               abortController.abort();
               abortControllers.delete(interactionId);
             }
-
-            const response = await fetch(
-              `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}`,
-              {
-                headers: {
-                  "Content-Type": "application/json; charset=utf-8",
-                  "User-Agent": userAgent,
-                },
-                method: "POST",
-                body: JSON.stringify({
-                  content: "[Test] this is a Follow up message",
-                }),
-              },
-            );
-
-            await fetch(
-              `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}`,
-              {
-                headers: {
-                  "Content-Type": "application/json; charset=utf-8",
-                  "User-Agent": userAgent,
-                },
-                method: "POST",
-                body: JSON.stringify({
-                  content: "[Test] Printing response for the follow up message\n" + response.status + "\n" + response.statusText + "\n" + response.body + "\n" + response,
-                }),
-              },
-            );
 
             return new Response(null, {
               status: 202,
