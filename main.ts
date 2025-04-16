@@ -76,20 +76,7 @@ Deno.serve(
                 JSON.stringify({
                   type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
                   data: {
-                    content: "Pong",
-                    components: [
-                      {
-                        type: 1,
-                        components: [
-                          {
-                            type: 2, // Button
-                            style: 1, // Primary
-                            label: "Test",
-                            custom_id: `Test_${interaction.id}`
-                          }
-                        ]
-                      }
-                    ]
+                    content: "Pong"
                   }
                 }),
                 {
@@ -175,7 +162,20 @@ Deno.serve(
                         },
                         method: "PATCH",
                         body: JSON.stringify({
-                          content: message + "\n\n***Generating...***\n\n-# AI generated content, can make mistakes"
+                          content: message + "\n\n***Generating...***\n\n-# AI generated content, can make mistakes",
+                          components: [
+                            {
+                              type: 1,
+                              components: [
+                                {
+                                  type: 2, // Button
+                                  style: 4, // Danger
+                                  label: "Stop",
+                                  custom_id: `Abort_${interaction.id}`
+                                }
+                              ]
+                            }
+                          ]
                         }),
                       },
                     );
