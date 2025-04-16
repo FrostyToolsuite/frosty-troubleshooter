@@ -79,13 +79,15 @@ Deno.serve(
                     content: "Pong",
                     components: [
                       {
-                        "type": 1,
-                        "components": {
-                          type: 2, // Button
-                          style: 1, // Danger
-                          label: "Stop",
-                          custom_id: `Abort_${interaction.id}`
-                        }
+                        type: 1,
+                        components: [
+                          {
+                            type: 2, // Button
+                            style: 1, // Primary
+                            label: "Test",
+                            custom_id: `Test_${interaction.id}`
+                          }
+                        ]
                       }
                     ]
                   }
