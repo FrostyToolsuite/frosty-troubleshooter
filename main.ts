@@ -162,7 +162,7 @@ Deno.serve(
                         },
                         method: "PATCH",
                         body: JSON.stringify({
-                          content: message + "\n\n***Generating...***\n\n-# AI generated content, can make mistakes",
+                          content: message + "\n\n***Generating...***\n-# AI generated content, can make mistakes",
                           components: [
                             {
                               type: 1,
@@ -192,6 +192,12 @@ Deno.serve(
                       body: JSON.stringify({
                         content: message +
                           "\n\n-# AI generated content, can make mistakes, check important info.",
+                        components: [
+                          {
+                            type: 1,
+                            components: []
+                          }
+                        ]
                       }),
                     },
                   );
@@ -207,7 +213,13 @@ Deno.serve(
                         method: "PATCH",
                         body: JSON.stringify({
                           content: message +
-                            "\n***Request Aborted***\n\n-# AI generated content, can make mistakes, check important info.",
+                            "\n\n**Request Aborted**\n-# AI generated content, can make mistakes, check important info.",
+                          components: [
+                            {
+                              type: 1,
+                              components: []
+                            }
+                          ]
                         }),
                       },
                     );
@@ -223,6 +235,12 @@ Deno.serve(
                         body: JSON.stringify({
                           content: message +
                             "\n\n-# AI generated content, can make mistakes, check important info.\n**An unexpected error occurred**\n" + error,
+                          components: [
+                            {
+                              type: 1,
+                              components: []
+                            }
+                          ]
                         }),
                       },
                     );
@@ -258,6 +276,12 @@ Deno.serve(
             if (abortController) {
               abortController.abort();
               abortControllers.delete(interactionId);
+              return new Response(null, {
+                status: 202,
+                headers: {
+                  "User-Agent": userAgent,
+                },
+              });
             }
           }
 
