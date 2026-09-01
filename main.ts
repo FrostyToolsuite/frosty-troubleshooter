@@ -128,6 +128,47 @@ Deno.serve(
               const signal = abortController.signal;
               abortControllers.set(interaction.id, abortController);
 
+              await fetch(
+                `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`,
+                {
+                  headers: {
+                    "Content-Type": "application/json; charset=utf-8",
+                    "User-Agent": userAgent,
+                  },
+                  method: "PATCH",
+                  body: JSON.stringify({
+                    content: "**Initializing...**",
+                  }),
+                },
+              );
+
+              fetch(
+                `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}`,
+                {
+                  headers: {
+                    "Content-Type": "application/json; charset=utf-8",
+                    "User-Agent": userAgent,
+                  },
+                  method: "POST",
+                  body: JSON.stringify({
+                    content: "Stop this request?",
+                    components: [
+                      {
+                        type: 1,
+                        components: [
+                          {
+                            type: 2, // Button
+                            style: 4, // Danger
+                            label: "Stop",
+                            custom_id: `Abort_${interaction.id}`
+                          }
+                        ]
+                      }
+                    ]
+                  }),
+                },
+              );
+              
               let message = "";
               (async () => {
                 try {
@@ -163,19 +204,6 @@ Deno.serve(
                         method: "PATCH",
                         body: JSON.stringify({
                           content: message + "\n\n***Generating...***\n-# AI generated content, can make mistakes",
-                          components: [
-                            {
-                              type: 1,
-                              components: [
-                                {
-                                  type: 2, // Button
-                                  style: 4, // Danger
-                                  label: "Stop",
-                                  custom_id: `Abort_${interaction.id}`
-                                }
-                              ]
-                            }
-                          ]
                         }),
                       },
                     );
@@ -195,6 +223,8 @@ Deno.serve(
                       }),
                     },
                   );
+
+
                 } catch (error) {
                   if (signal.aborted) {
                     await fetch(
@@ -211,35 +241,6 @@ Deno.serve(
                         }),
                       },
                     );
-
-                    const response = await fetch(
-                      `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}`,
-                      {
-                        headers: {
-                          "Content-Type": "application/json; charset=utf-8",
-                          "User-Agent": userAgent,
-                        },
-                        method: "POST",
-                        body: JSON.stringify({
-                          content: "[Test] this is a Follow up message",
-                        }),
-                      },
-                    );
-        
-                    await fetch(
-                      `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}`,
-                      {
-                        headers: {
-                          "Content-Type": "application/json; charset=utf-8",
-                          "User-Agent": userAgent,
-                        },
-                        method: "POST",
-                        body: JSON.stringify({
-                          content: "[Test] Printing response for the follow up message\n" + response.status + "\n" + response.statusText + "\n" + response.body + "\n" + response,
-                        }),
-                      },
-                    );
-
                   } else {
                     await fetch(
                       `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`,
@@ -289,6 +290,17 @@ Deno.serve(
               abortControllers.delete(interactionId);
             }
 
+            await fetch(
+              `https://discord.com/api/v10/webhooks/${Deno.env.get(EnvVars.DISCORD_APPLICATION_ID)}/${interaction.token}/messages/@original`,
+              {
+                headers: {
+                  "Content-Type": "application/json; charset=utf-8",
+                  "User-Agent": userAgent,
+                },
+                method: "DELETE"
+              },
+            );
+            
             return new Response(null, {
               status: 202,
               headers: {
